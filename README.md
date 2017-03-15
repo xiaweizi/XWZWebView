@@ -1,9 +1,8 @@
-[![](https://jitpack.io/v/xiaweizi/XWZWebView.svg)](https://jitpack.io/#xiaweizi/XWZWebView)
-
-
-##1. 使用步骤：##
+![](https://jitpack.io/v/xiaweizi/XWZWebView.svg)
 
 ![webView整体预览.gif](http://upload-images.jianshu.io/upload_images/4043475-3e6e823547b6c003.gif?imageMogr2/auto-orient/strip)
+
+##1. 使用步骤：##
 
 ####1. 在项目的 build.gradle 文件中添加
 
