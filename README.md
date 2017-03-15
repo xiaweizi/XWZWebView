@@ -1,4 +1,3 @@
-![](https://jitpack.io/v/xiaweizi/XWZWebView.svg)
 
 ![webView整体预览.gif](http://upload-images.jianshu.io/upload_images/4043475-3e6e823547b6c003.gif?imageMogr2/auto-orient/strip)
 
@@ -33,3 +32,5 @@
 >5. 点击返回键回退到上个浏览记录
 >
 >等等...
+
+![](https://jitpack.io/v/xiaweizi/XWZWebView.svg)
