@@ -1,13 +1,14 @@
 package com.xiawei.webviewlib;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -16,22 +17,37 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
-public class WebViewActivity extends AppCompatActivity {
+import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
+
+public class WebViewActivity extends SwipeBackActivity {
 
     private WebView mWebView;
 
+    private ImageView ivLeftBack;
+    private TextView mTitle;
+    private ProgressBar mProgressBar;
+    private ProgressBar mProgress;
+
     private static final String TAG = "MainActivity----->";
     private WebSettings mWebViewSettings;
+
+    /**
+     * 默认打开的网址
+     */
     private String mUrl = "http://www.jianshu.com/u/d36586119d8c";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
-        mWebView = (WebView) findViewById(R.id.web_view);
-
         mUrl = getIntent().getStringExtra("url");
+
+        initView();
 
         initWebView();
 
@@ -42,6 +58,33 @@ public class WebViewActivity extends AppCompatActivity {
         initWebChromeClient();
     }
 
+    public static void startUrl(Context context, String url){
+        Intent intent = new Intent(context, WebViewActivity.class);
+        intent.putExtra("url", url);
+        context.startActivity(intent);
+    }
+
+    /**
+     * 初始化 view
+     */
+    private void initView() {
+        mWebView = (WebView) findViewById(R.id.web_view);
+        ivLeftBack = (ImageView) findViewById(R.id.iv_left_back);
+        mTitle = (TextView) findViewById(R.id.tv_title);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressbar);
+        mProgress = (ProgressBar) findViewById(R.id.pb_progress);
+
+        ivLeftBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WebViewActivity.this.finish();
+            }
+        });
+    }
+
+    /**
+     * 初始化 webSetting
+     */
     private void initWebSettings() {
         // 支持 JS
         mWebViewSettings.setJavaScriptEnabled(true);
@@ -91,6 +134,9 @@ public class WebViewActivity extends AppCompatActivity {
         mWebViewSettings.setLoadWithOverviewMode(true);
     }
 
+    /**
+     * 初始化 webView
+     */
     private void initWebView() {
         mWebView.loadUrl(mUrl);
         mWebViewSettings = mWebView.getSettings();
@@ -107,16 +153,22 @@ public class WebViewActivity extends AppCompatActivity {
         mWebView.setDownloadListener(new MyDownloadListener());
     }
 
+    /**
+     * 初始化 webChromeClient
+     */
     private void initWebChromeClient() {
         mWebView.setWebChromeClient(new WebChromeClient(){
+
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-                Log.i(TAG, "onProgressChanged: ");
-                Log.d(TAG, "progress: " + newProgress);
+                mProgress.setProgress(newProgress);
             }
         });
     }
 
+    /**
+     * 初始化 webViewClient
+     */
     private void initWebViewClient() {
         mWebView.setWebViewClient(new WebViewClient(){
             @Override
@@ -143,13 +195,17 @@ public class WebViewActivity extends AppCompatActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                Log.i(TAG, "onPageStarted: " + Thread.currentThread().getName());
+                mTitle.setText("正在加载中...");
+                mProgressBar.setVisibility(View.VISIBLE);
+                mProgress.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                Log.i(TAG, "onPageFinished: ");
+                mProgressBar.setVisibility(View.GONE);
+                mProgress.setVisibility(View.GONE);
+                mTitle.setText(view.getTitle());
                 if (!mWebViewSettings.getLoadsImagesAutomatically()){
                     mWebViewSettings.setLoadsImagesAutomatically(true);
                 }
@@ -158,6 +214,7 @@ public class WebViewActivity extends AppCompatActivity {
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                 super.onReceivedError(view, request, error);
+                Toast.makeText(WebViewActivity.this, "出错了", Toast.LENGTH_SHORT).show();
                 Log.i(TAG, "onReceivedError: ");
             }
         });
